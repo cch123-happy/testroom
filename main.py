@@ -25,7 +25,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # WebSocket 路由
-@app.websocket("/ws/{client_name}")
+@app.websocket("wss://ws.postman-echo.com/raw")
 async def websocket_chat(websocket: WebSocket, client_name: str):
     await manager.connect(websocket)
     await manager.broadcast(f"【{client_name}】加入了聊天室")
