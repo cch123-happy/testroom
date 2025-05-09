@@ -19,7 +19,7 @@
     <div id="chat" style="display:none">
         <div id="messages"></div>
         <input type="text" id="message" placeholder="输入消息" />
-        <button onclick="send()">发送</button>
+        <button onclick="send()">发送</button><button onclick="send()">上传文件</button>
     </div>
 
     <script>
@@ -31,7 +31,7 @@
             if (!username) return alert("请输入名字！");
 
             // 连接 FastAPI 的 WebSocket 路由
-            ws = new WebSocket("wss://ws.postman-echo.com/raw");
+            ws = new WebSocket(`ws://${location.host}/ws/${username}`);
 
             // 接收消息时的处理
             ws.onmessage = (event) => {
