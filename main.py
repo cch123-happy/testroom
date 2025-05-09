@@ -25,7 +25,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # WebSocket 路由
-@app.websocket("wss://ws.postman-echo.com/raw")
+@app.websocket("/ws/{client_name}")
 async def websocket_chat(websocket: WebSocket, client_name: str):
     await manager.connect(websocket)
     await manager.broadcast(f"【{client_name}】加入了聊天室")
@@ -38,7 +38,27 @@ async def websocket_chat(websocket: WebSocket, client_name: str):
         manager.disconnect(websocket)
         await manager.broadcast(f"【{client_name}】离开了聊天室")
 
-# 前端页面（测试用）
+# 前端页面
 @app.get("/")
 async def get():
     return FileResponse("static/index.html")
+
+# 上传csv
+@app.post("/upload-csv/")
+async def upload_csv(file: UploadFile = File(...)):
+    # 读取CSV文件内容
+    contents = await file.read()
+    
+    # 使用pandas解析CSV（需安装pandas）
+    df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
+
+    with open (file.filename,"wb") as buff:
+        buff.write(contents)
+    
+    # 转换为字典列表
+    data = df.to_dict(orient="records")
+    
+    return JSONResponse({
+        "filename": file.filename,
+        "data": data  # 返回解析后的数据
+    })
