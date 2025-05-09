@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>聊天室</title>
+    <style>
+        #messages { height: 300px; border: 1px solid #ccc; overflow-y: scroll; }
+    </style>
+</head>
+<body>
+    <h1>FastAPI 聊天室</h1>
+    
+    <!-- 1. 用户名输入区 -->
+    <div id="login">
+        <input type="text" id="username" placeholder="输入你的名字" />
+        <button onclick="connect()">加入聊天</button>
+    </div>
+
+    <!-- 2. 聊天区（默认隐藏） -->
+    <div id="chat" style="display:none">
+        <div id="messages"></div>
+        <input type="text" id="message" placeholder="输入消息" />
+        <button onclick="send()">发送</button>
+    </div>
+
+    <script>
+        let ws;  // 存储 WebSocket 连接
+
+        // 连接 WebSocket
+        function connect() {
+            const username = document.getElementById("username").value;
+            if (!username) return alert("请输入名字！");
+
+            // 连接 FastAPI 的 WebSocket 路由
+            ws = new WebSocket(`ws://${location.host}/ws/${username}`);
+
+            // 接收消息时的处理
+            ws.onmessage = (event) => {
+                const messages = document.getElementById("messages");
+                messages.innerHTML += `<div>${event.data}</div>`;
+                messages.scrollTop = messages.scrollHeight;  // 自动滚动到底部
+            };
+
+            // 显示聊天区，隐藏登录区
+            document.getElementById("login").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+        }
+
+        // 发送消息
+        function send() {
+            const message = document.getElementById("message").value;
+            if (!message) return;
+
+            ws.send(message);  // 通过 WebSocket 发送消息
+            document.getElementById("message").value = "";  // 清空输入框
+        }
+
+        // 按回车发送消息
+        document.getElementById("message").addEventListener("keyup", (e) => {
+            if (e.key === "Enter") send();
+        });
+    </script>
+</body>
+</html>
