@@ -23,41 +23,41 @@
     </div>
 
     <script>
-        let ws;  // 存储 WebSocket 连接
-
-        // 连接 WebSocket
+        let ws;
+      
         function connect() {
-            const username = document.getElementById("username").value;
-            if (!username) return alert("请输入名字！");
-
-            // 连接 FastAPI 的 WebSocket 路由
-            ws = new WebSocket("wss://ws.postman-echo.com/raw");
-
-            // 接收消息时的处理
-            ws.onmessage = (event) => {
-                const messages = document.getElementById("messages");
-                messages.innerHTML += `<div>${event.data}</div>`;
-                messages.scrollTop = messages.scrollHeight;  // 自动滚动到底部
-            };
-
-            // 显示聊天区，隐藏登录区
+          const username = document.getElementById("username").value;
+          if (!username) return alert("请输入名字！");
+      
+          // 使用免费 WebSocket 测试服务（示例）
+          ws = new WebSocket("wss://ws.postman-echo.com/raw");
+      
+          ws.onmessage = (event) => {
+            const messages = document.getElementById("messages");
+            // 测试服务会原样返回消息，这里加上用户名
+            messages.innerHTML += `<div>${username}: ${event.data}</div>`;
+            messages.scrollTop = messages.scrollHeight;
+          };
+      
+          ws.onopen = () => {
+            // 连接成功后发送一条欢迎消息
+            ws.send(`${username} 加入了聊天`);
             document.getElementById("login").style.display = "none";
             document.getElementById("chat").style.display = "block";
+          };
+      
+          ws.onerror = (error) => {
+            console.error("WebSocket 错误:", error);
+            alert("连接测试服务失败，请换一个地址或稍后再试。");
+          };
         }
-
-        // 发送消息
+      
         function send() {
-            const message = document.getElementById("message").value;
-            if (!message) return;
-
-            ws.send(message);  // 通过 WebSocket 发送消息
-            document.getElementById("message").value = "";  // 清空输入框
+          const message = document.getElementById("message").value;
+          if (!message || !ws) return;
+          ws.send(message);
+          document.getElementById("message").value = "";
         }
-
-        // 按回车发送消息
-        document.getElementById("message").addEventListener("keyup", (e) => {
-            if (e.key === "Enter") send();
-        });
-    </script>
+      </script>
 </body>
 </html>
