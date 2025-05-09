@@ -31,7 +31,7 @@
             if (!username) return alert("请输入名字！");
 
             // 连接 FastAPI 的 WebSocket 路由
-            ws = new WebSocket(`ws://${location.host}/ws/${username}`);
+            ws = new WebSocket(`wss://echo.websocket.org`);
 
             // 接收消息时的处理
             ws.onmessage = (event) => {
